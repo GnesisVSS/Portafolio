@@ -1,0 +1,154 @@
+﻿<UserControl x:Class="Portafolio.A_ReporteEstGlobal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Portafolio"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:MetroChart="clr-namespace:De.TorstenMandelkow.MetroChart;assembly=De.TorstenMandelkow.MetroChart" 
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             mc:Ignorable="d" Width="1116" Height="690">
+    <Grid Background="White" x:Name="print">
+
+        <Grid Margin="107,253,671,100">
+
+            <Grid.OpacityMask>
+                <VisualBrush Visual="{ Binding ElementName=BorderG2 }"/>
+            </Grid.OpacityMask>
+
+            <Border x:Name="BorderG2" CornerRadius="15">
+                <Border.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FFBEFFFF" Offset="0"/>
+                        <GradientStop Color="#FFA692FF" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+            <lvc:PieChart x:Name="prueba" LegendLocation="Bottom" Series="{Binding SeriesCollection}" DataClick="PieChart_DataClick" Hoverable="True" InnerRadius="0" Margin="50,82,50,26" >
+                <lvc:PieChart.ChartLegend>
+                    <lvc:DefaultLegend BulletSize="15" TextBlock.FontSize="8" FontWeight="Bold"></lvc:DefaultLegend>
+                </lvc:PieChart.ChartLegend>
+                <lvc:PieChart.DataTooltip>
+                    <lvc:DefaultTooltip BulletSize="20"></lvc:DefaultTooltip>
+                </lvc:PieChart.DataTooltip>
+            </lvc:PieChart>
+        </Grid>
+        <Grid Margin="471,253,307,100">
+            <Grid.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#FFFCBEFF"/>
+                    <GradientStop Color="#FF9F8CF7" Offset="1"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+
+            <Grid.OpacityMask>
+                <VisualBrush Visual="{ Binding ElementName=BorderG2 }"/>
+            </Grid.OpacityMask>
+            <lvc:PieChart Name="Chart" Series="{Binding SeriesCollection2}" 
+                      LegendLocation="Right" InnerRadius="60" Margin="32,48,26,14" Visibility="Hidden">
+                <lvc:PieChart.ChartLegend>
+                    <lvc:DefaultLegend BulletSize="20"></lvc:DefaultLegend>
+                </lvc:PieChart.ChartLegend>
+                <lvc:PieChart.DataTooltip>
+                    <lvc:DefaultTooltip BulletSize="20"></lvc:DefaultTooltip>
+                </lvc:PieChart.DataTooltip>
+            </lvc:PieChart>
+            <lvc:PieChart Name="Chart2" Series="{Binding SeriesCollection3}" 
+                      LegendLocation="Right" InnerRadius="60" Margin="32,48,26,14">
+                <lvc:PieChart.ChartLegend>
+                    <lvc:DefaultLegend BulletSize="20"></lvc:DefaultLegend>
+                </lvc:PieChart.ChartLegend>
+                <lvc:PieChart.DataTooltip>
+                    <lvc:DefaultTooltip BulletSize="20"></lvc:DefaultTooltip>
+                </lvc:PieChart.DataTooltip>
+            </lvc:PieChart>
+        </Grid>
+        <Label Content="Reporte Estadístico Global" HorizontalAlignment="Left" Margin="287,40,0,0" VerticalAlignment="Top" Foreground="#FF5B5B5B" FontSize="36" FontFamily="Bahnschrift Light" FontWeight="Bold" Width="446"/>
+        <Image Margin="733,28,298,606" Source="grafico-de-barras.png" Stretch="Uniform"/>
+        <Button HorizontalAlignment="Left" Margin="28,80,0,0" VerticalAlignment="Top" Width="46" Background="{x:Null}" Foreground="Black" FontWeight="Bold" Height="47" Click="Button_Click" Padding="0" BorderBrush="{x:Null}">
+            <Image Source="refresh(1).png" Stretch="Uniform" Height="37" Width="35"/>
+        </Button>
+        <Button x:Name="btnPDF" Content="Generar PDF" HorizontalAlignment="Left" Margin="970,612,0,0" VerticalAlignment="Top" Width="118" Background="White" Foreground="Black" FontWeight="Bold" Height="40" Click="btnPDF_Click">
+            <Button.BorderBrush>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#FF00A2FF" Offset="0"/>
+                    <GradientStop Color="#FF1700FF" Offset="1"/>
+                </LinearGradientBrush>
+            </Button.BorderBrush>
+        </Button>
+        <materialDesign:Card x:Name="cardCantClientes"  HorizontalAlignment="Left" Margin="79,122,0,0" VerticalAlignment="Top" Height="82" Width="161">
+            <materialDesign:Card.Background>
+                <LinearGradientBrush>
+                    <GradientStop Color="#FF84B6FD" Offset="0"/>
+                    <GradientStop Color="#FFAA54FF" Offset="1"/>
+                </LinearGradientBrush>
+            </materialDesign:Card.Background>
+            <Label x:Name="lblCantClientes" Content="" HorizontalAlignment="Center" Margin="10,37,10,10" VerticalAlignment="Center" Foreground="#DDFFFFFF" FontWeight="Bold" Width="141" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="18" Height="35"/>
+        </materialDesign:Card>
+        <materialDesign:Card x:Name="cardCantProfesionales"  HorizontalAlignment="Left" Margin="268,122,0,0" VerticalAlignment="Top" Height="82" Width="172">
+            <materialDesign:Card.Background>
+                <LinearGradientBrush>
+                    <GradientStop Color="#FF00DCFF" Offset="0"/>
+                    <GradientStop Color="#FF3C4DFF" Offset="1"/>
+                </LinearGradientBrush>
+            </materialDesign:Card.Background>
+            <Label x:Name="lblCantProfesionales" Content="" HorizontalAlignment="Center" Margin="10,37,10,10" VerticalAlignment="Center" Foreground="#DDFFFFFF" FontWeight="Bold" Width="152" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="18" Height="35"/>
+        </materialDesign:Card>
+        <materialDesign:Card x:Name="cardCant"  HorizontalAlignment="Left" Margin="465,122,0,0" VerticalAlignment="Top" Height="82" Width="172">
+            <materialDesign:Card.Background>
+                <LinearGradientBrush>
+                    <GradientStop Color="#FF84B6FD" Offset="0"/>
+                    <GradientStop Color="#FFAA54FF" Offset="1"/>
+                </LinearGradientBrush>
+            </materialDesign:Card.Background>
+            <Label x:Name="lblCantCap" Content="" HorizontalAlignment="Center" Margin="10,37,10,10" VerticalAlignment="Center" Foreground="#DDFFFFFF" FontWeight="Bold" Width="152" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="18" Height="35"/>
+        </materialDesign:Card>
+        <materialDesign:Card x:Name="cardCant2"  HorizontalAlignment="Left" Margin="664,122,0,0" VerticalAlignment="Top" Height="82" Width="172">
+            <materialDesign:Card.Background>
+                <LinearGradientBrush>
+                    <GradientStop Color="#FF00DCFF" Offset="0"/>
+                    <GradientStop Color="#FF3C4DFF" Offset="1"/>
+                </LinearGradientBrush>
+            </materialDesign:Card.Background>
+            <Label x:Name="lblCantVisita" Content="" HorizontalAlignment="Center" Margin="10,37,10,10" VerticalAlignment="Center" Foreground="#DDFFFFFF" FontWeight="Bold" Width="152" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="18" Height="35"/>
+        </materialDesign:Card>
+        <materialDesign:Card x:Name="cardCant3"  HorizontalAlignment="Left" Margin="866,122,0,0" VerticalAlignment="Top" Height="82" Width="172">
+            <materialDesign:Card.Background>
+                <LinearGradientBrush>
+                    <GradientStop Color="#FF84B6FD" Offset="0"/>
+                    <GradientStop Color="#FFAA54FF" Offset="1"/>
+                </LinearGradientBrush>
+            </materialDesign:Card.Background>
+            <Label x:Name="lblCantContrato" Content="" HorizontalAlignment="Center" Margin="10,37,10,10" VerticalAlignment="Center" Foreground="#DDFFFFFF" FontWeight="Bold" Width="152" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="18" Height="35"/>
+        </materialDesign:Card>
+        <Grid Margin="841,271,38,278">
+            <lvc:Gauge x:Name="CantClientesActivos" Grid.Column="0"
+                   Uses360Mode="True"
+                   From="0" To="100"
+                   HighFontSize="60" Foreground="White"
+                   InnerRadius="0" GaugeBackground="#BE9A6CFD"  FromColor="#BE3700AC" Margin="0,0,0,10">
+            </lvc:Gauge>
+        </Grid>
+        <Grid Margin="841,453,38,100">
+            <lvc:Gauge x:Name="CantClientesInac" Grid.Column="0"
+                   Uses360Mode="True"
+                   From="0" To="100"
+                   HighFontSize="60" Foreground="White"
+                   InnerRadius="0" GaugeBackground="#BE0085FB" FromColor="#BE0000FF" Margin="0,0,0,10"/>
+        </Grid>
+        <Label Content="Clientes Totales" HorizontalAlignment="Left" Margin="105,142,0,0" VerticalAlignment="Top" Width="107" Foreground="#DDFFFFFF" FontFamily="Bahnschrift Light" FontWeight="Bold" FontSize="14"/>
+        <Label Content="Profesionales Totales" HorizontalAlignment="Left" Margin="283,142,0,0" VerticalAlignment="Top" Width="148" Foreground="#DDFFFFFF" FontFamily="Bahnschrift Light" FontWeight="Bold" FontSize="14"/>
+        <Label Content="Clientes totales asignados por empleado" HorizontalAlignment="Left" Margin="137,266,0,0" VerticalAlignment="Top" Width="271" Foreground="#DD000000" FontFamily="Corbel" FontSize="14" FontWeight="Bold"/>
+        <Label Content="Actividades por Estado" HorizontalAlignment="Left" Margin="503,266,0,0" VerticalAlignment="Top" Width="271" Foreground="#DD000000" FontFamily="Corbel" FontSize="14" FontWeight="Bold"/>
+        <ComboBox x:Name="cboCapacitaciones" HorizontalAlignment="Left" Margin="471,223,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="cboCapacitaciones_SelectionChanged" SelectedIndex="0">
+            <ComboBoxItem Content="Capacitaciones" HorizontalAlignment="Left" Width="118"/>
+            <ComboBoxItem Content="Visitas" HorizontalAlignment="Left" Width="118"/>
+        </ComboBox>
+        <Label Content="Clientes Activos" HorizontalAlignment="Left" Margin="901,236,0,0" VerticalAlignment="Top" Width="119" Foreground="#DD000000" FontFamily="Corbel" FontSize="14" FontWeight="Bold"/>
+        <Label Content="Clientes Inactivos" HorizontalAlignment="Left" Margin="901,423,0,0" VerticalAlignment="Top" Width="119" Foreground="#DD000000" FontFamily="Corbel" FontSize="14" FontWeight="Bold"/>
+        <Label Content="Capacitaciones Totales" HorizontalAlignment="Left" Margin="476,142,0,0" VerticalAlignment="Top" Width="154" Foreground="#DDFFFFFF" FontFamily="Bahnschrift Light" FontWeight="Bold" FontSize="14"/>
+        <Label Content="Visitas Totales" HorizontalAlignment="Left" Margin="700,142,0,0" VerticalAlignment="Top" Width="104" Foreground="#DDFFFFFF" FontFamily="Bahnschrift Light" FontWeight="Bold" FontSize="14"/>
+        <Label Content="Contratos Totales" HorizontalAlignment="Left" Margin="895,142,0,0" VerticalAlignment="Top" Width="125" Foreground="#DDFFFFFF" FontFamily="Bahnschrift Light" FontWeight="Bold" FontSize="14"/>
+   
+    </Grid>
+</UserControl>

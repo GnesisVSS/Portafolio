@@ -1,0 +1,75 @@
+create or replace PROCEDURE sp_datosprof(profesional out SYS_REFCURSOR)
+is
+begin 
+    open profesional for select pnombreprf, direccionprf, fechanacprf from profesional;
+end;
+
+create or replace procedure sp_datoscli(cliente out SYS_REFCURSOR,v_id varchar)
+is
+begin
+    open cliente for select nombrerepre, cargorepre, numeroreprese from representante where rutrepresent = v_id;
+end;    
+
+create or replace procedure sp_asesoriasprof(asesorias out SYS_REFCURSOR,v_id varchar)
+is
+begin
+    open asesorias for select r.rutrepresent||'-'||digitoverirepresent rutcli, idasesoria, a.fechaasesoria, correoemp, telefonoemp, nombreemp from asesoria a 
+inner join empresa e on a.rutemp = e.rutemp 
+inner join representante r on e.rutrepresent = r.rutrepresent where a.runprf = v_id;
+end;
+
+create or replace procedure sp_capacitacionesprf(capacitaciones out SYS_REFCURSOR,v_id varchar)
+is
+begin
+    open capacitaciones for select idcapacitacion, r.rutrepresent, fechacapacitacion, horacapacitacion, cantasistentes nombreemp, estado from capacitaciones c 
+    inner join empresa e on e.rutemp = c.rutemp 
+    inner join representante r on e.rutrepresent = r.rutrepresent where c.runprf = v_id;
+end;
+
+create or replace procedure sp_visitasprof(visitas out SYS_REFCURSOR,v_id varchar)
+is
+begin
+    open visitas for select idvisita,fechavisita,tipovisitas,estado,nombreemp,r.rutrepresent||'-'||r.digitoverirepresent rutcli from visitas v 
+inner join empresa e on e.rutemp = v.rutemp 
+inner join representante r on e.rutrepresent = r.rutrepresent where v.runprf=v_id;
+end;
+
+
+
+
+create or replace NONEDITIONABLE procedure sp_checklistprof(registro out SYS_REFCURSOR, v_id varchar,v_com1 varchar,v_com2 VARCHAR,v_com3 VARCHAR,v_comext1 varchar, v_comext2 varchar, v_comext3 varchar)
+is
+
+begin
+    open registro for select r.descripcionitem1,r.comentarioitem1,
+    r.descripcionitem2,r.comentarioitem2,
+    r.descripcionitem3,r.comentarioitem3,
+    r.descripcionitem1extra,r.comentarioitemextra1,
+    r.descripcionitem2extra,r.comentarioitemextra2,
+    r.descripcionitem3extra,r.comentarioitemextra3
+    from registro r inner join visitas v
+    on r.idvisita=v.idvisita
+    where v.runprf=v_id;
+    
+    insert into registro VALUES((select max(IDREGISTRO)+1 FROM REGISTRO),1,1,1, v_com1,v_com2,v_com3,1,1,1,v_comext1,v_comext2,v_comext3,(select max(IDVISITA)+1 FROM REGISTRO),'SEGURIDAD DEL TERRENO','SEGURIDAD DE LAS INSTALACIONES', 
+    'SEGURIDAD DE LOS TRABAJADORES','UTILIZACION DE EPP','BUENAS PRACTICAS DE LA INSDUSTRIA', 'OTROS');
+end;
+
+
+
+
+create or replace NONEDITIONABLE procedure sp_checklistprof(registro out SYS_REFCURSOR, v_id varchar)
+is
+
+begin
+    open registro for select r.descripcionitem1,r.comentarioitem1,
+    r.descripcionitem2,r.comentarioitem2,
+    r.descripcionitem3,r.comentarioitem3,
+    r.descripcionitem1extra,r.comentarioitemextra1,
+    r.descripcionitem2extra,r.comentarioitemextra2,
+    r.descripcionitem3extra,r.comentarioitemextra3
+    from registro r inner join visitas v
+    on r.idvisita=v.idvisita
+    where v.runprf=v_id;
+
+end;

@@ -1,0 +1,60 @@
+﻿<UserControl x:Class="Portafolio.A_GestionContratos"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Portafolio" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             mc:Ignorable="d" Width="1116" Height="690">
+    <Grid Background="White">
+        <Button x:Name="btnNotificarPago_Copy" Content="Actualizar" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="105" Background="White" Click="BtnNotificarPago_Click" Foreground="Black" FontWeight="Bold" Margin="0,0,127,53" Height="48" >
+            <Button.BorderBrush>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#FF00A2FF"/>
+                    <GradientStop Color="#FF1700FF" Offset="1"/>
+                </LinearGradientBrush>
+            </Button.BorderBrush>
+        </Button>
+        <Label x:Name="lblRunCliente" Content="Run Representante" HorizontalAlignment="Left" Margin="585,120,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="txtRunCliente" HorizontalAlignment="Left" Height="24" Margin="691,120,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" KeyDown="txtRunCliente_KeyDown" MaxLength="9"/>
+        <Label x:Name="lblFiltro" Content="Filtrar por empresa" HorizontalAlignment="Left" Margin="144,120,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="txtEmpresa" HorizontalAlignment="Left" Height="24" Margin="262,120,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="137" MaxLength="10"/>
+        <DataGrid x:Name="dgContrato" Margin="144,174,0,178" HorizontalAlignment="Left" Width="845" Loaded="dgContrato_Loaded" BorderBrush="#1F2300FF" SelectionChanged="dgContrato_SelectionChanged" IsEnabled="true" IsReadOnly="true"/>
+        <Label Content="Gestión de Contrato" HorizontalAlignment="Left" Margin="373,28,0,0" VerticalAlignment="Top" Foreground="#FF5B5B5B" FontSize="36" FontFamily="Bahnschrift Light" FontWeight="Bold" Height="50"/>
+        <Image Margin="700,18,342,604" Source="users.png" Stretch="Uniform"/>
+        <Button x:Name="btnBuscar" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="38"  Height="29" Background="Transparent" BorderBrush="Transparent" Foreground="Black" FontWeight="Bold" Click="btnBuscar_Click" Margin="850,118,0,0" Padding="0">
+            <Image Height="30" Source="buscar(2).png" Stretch="Uniform" Width="38"/>
+        </Button>
+        <Button x:Name="btnCancelar" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="27"  Height="26" Background="Transparent" BorderBrush="Transparent" Foreground="Black" FontWeight="Bold" Click="btnCancelar_Click" Margin="399,118,0,0" Padding="0" RenderTransformOrigin="0.5,0.5">
+            <Image Source="boton-x.png" Stretch="Uniform" Height="13" Width="14"/>
+
+        </Button>
+        <Button x:Name="btnCancelar2" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="26"  Height="26" Background="Transparent" BorderBrush="Transparent" Foreground="Black" FontWeight="Bold" Click="btnCancelar2_Click" Margin="824,118,0,0" Padding="0" RenderTransformOrigin="0.5,0.5">
+            <Image Source="boton-x.png" Stretch="Uniform" Height="14" Width="14"/>
+        </Button>
+        <Label x:Name="lbl1" Content="" HorizontalAlignment="Left" Margin="126,594,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
+        <Label x:Name="lbl3" Content="" HorizontalAlignment="Left" Margin="253,594,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
+        <Label x:Name="lbl8" Content="" HorizontalAlignment="Left" Margin="545,594,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
+        <Label x:Name="lbl7" Content="" HorizontalAlignment="Left" Margin="483,594,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
+        <Label x:Name="lbl6" Content="" HorizontalAlignment="Left" Margin="423,594,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
+        <Label x:Name="lbl5" Content="" HorizontalAlignment="Left" Margin="364,594,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
+        <Label x:Name="lbl4" Content="" HorizontalAlignment="Left" Margin="315,594,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
+        <Label x:Name="lbl2" Content="" HorizontalAlignment="Left" Margin="187,594,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
+        <Label x:Name="lbl9" Content="" HorizontalAlignment="Left" Margin="602,594,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
+        <Label x:Name="lblEtiquetaProfesional" Content="Reasignar Profesional" HorizontalAlignment="Left" Margin="144,543,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
+        <TextBox x:Name="txtProfesional" HorizontalAlignment="Left" Height="23" Margin="280,543,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Visibility="Hidden"/>
+        <Button x:Name="btnBuscarEmp" HorizontalAlignment="Left" Margin="410,530,0,0" VerticalAlignment="Top" Width="39"  Height="36" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="Black" FontWeight="Bold" Click="btnBuscarEmp_Click" Padding="0" Visibility="Hidden">
+            <Image Height="29" Source="buscar(2).png" Stretch="Uniform" Width="38"/>
+        </Button>
+        <Label x:Name="lblEtiquetaEstado" Content="Actualizar Estado" HorizontalAlignment="Left" Margin="482,543,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
+        <ComboBox x:Name="cboEstado" HorizontalAlignment="Left" Margin="603,543,0,0" VerticalAlignment="Top" Width="120" Visibility="Hidden">
+            <ComboBoxItem Content="Seleccione una opción" HorizontalAlignment="Left" Width="118" IsEnabled="False"/>
+            <ComboBoxItem Content="Indefinido" HorizontalAlignment="Left" Width="118" IsEnabled="True"/>
+            <ComboBoxItem Content="Temporal" HorizontalAlignment="Left" Width="118" IsEnabled="True"/>
+            <ComboBoxItem Content="Reemplazo" HorizontalAlignment="Left" Width="118" IsEnabled="True"/>
+            <ComboBoxItem Content="Inactivo" HorizontalAlignment="Left" Width="118" IsEnabled="True"/>
+        </ComboBox>
+        <DataGrid x:Name="dgProfesional" HorizontalAlignment="Left" Height="114" Margin="280,566,0,0" VerticalAlignment="Top" Width="119" Visibility="Hidden" SelectionChanged="dgProfesional_SelectionChanged" IsReadOnly="true"/>
+    </Grid>
+</UserControl>

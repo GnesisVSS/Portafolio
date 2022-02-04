@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<title></title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<head>
+
+</head>
+
+<style>
+    html,
+    body,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+        font-family: "Open Sans", sans-serif
+    }
+</style>
+
+
+
+<body class="w3-theme-l5">
+
+    <!-- Navbar -->
+    <div class="w3-top">
+        <div class="w3-bar w3-light-blue w3-left-align w3-large">
+            <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-theme-d2"
+                href="javascript:void(0);" onclick="openNav()"><i class="fa fa-bars"></i></a>
+            <a class="w3-bar-item w3-padding-large w3-light-blue"><i class="fa fa-home w3-margin-right"></i>No Más
+                Accidentes</a>
+            <!-- <a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="News"><i
+                    class="fa fa-globe"></i></a>
+            <a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white"
+                title="Account Settings"><i class="fa fa-user"></i></a>
+            <a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="Messages"><i
+                    class="fa fa-envelope"></i></a> -->
+
+
+            <!--
+            <div class="w3-dropdown-hover w3-hide-small">
+                <button class="w3-button w3-padding-large" title="Notifications"><i class="fa fa-bell"></i><span
+                        class="w3-badge w3-right w3-small w3-green">3</span></button>
+                <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:300px">
+                    <a href="#" class="w3-bar-item w3-button">One new friend request</a>
+                    <a href="#" class="w3-bar-item w3-button">John Doe posted on your wall</a>
+                    <a href="#" class="w3-bar-item w3-button">Jane likes your post</a>
+                </div>
+            </div> -->
+            <a href="{% url 'CERRARSESION' %}"
+                class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white"
+                onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Cerrar Sesion
+            </a>
+        </div>
+    </div>
+
+    <!-- Navbar on small screens -->
+    <div id="navDemo" class="w3-bar-block w3-light-blue w3-hide w3-hide-large w3-hide-medium w3-large">
+        <a href="#" class="w3-bar-item w3-button w3-padding-large">Link 1</a>
+        <a href="#" class="w3-bar-item w3-button w3-padding-large">Link 2</a>
+        <a href="#" class="w3-bar-item w3-button w3-padding-large">Link 3</a>
+        <a href="{% url 'CERRARSESION' %}" class="w3-bar-item w3-button w3-padding-large">Cerrar Sesión</a>
+    </div>
+
+    <!-- Page Container -->
+    <div class="w3-container w3-content" style="max-width:1400px;margin-top:80px">
+        <!-- The Grid -->
+        <div class="w3-row">
+            <!-- Left Column -->
+            <div class="w3-col m3">
+                <!-- Profile -->
+                <div class="w3-card w3-round w3-white">
+                    <div class="w3-container">
+
+                        <h4 class="w3-center"><b>Perfil Cliente</b></h4>
+                        <p class="w3-center"><img src="/static/img/iconoPerfil.png" class="w3-circle"
+                                style="height:106px;width:106px" alt="Avatar"></p>
+                        <hr>
+
+                        {% for p in datoscli %}
+                        <tr>
+                            <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i><label
+                                    class="w3-input w3-border w3-margin-bottom" name="txtuser" id="txtuser"
+                                    required="obligatorio">
+                                    <td>{{ p.0 }} </td>
+                            </p>
+                            <p><i class="fa fa-home fa-fw w3-margin-right w3-text-theme"></i><label
+                                    class="w3-input w3-border w3-margin-bottom" name="txtdire" id="txtdire"
+                                    required="obligatorio">
+                                    <td>{{ p.1 }} </td>
+                            </p>
+                            <p><i class="fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme"></i><label
+                                    class="w3-input w3-border w3-margin-bottom" name="txtnac" id="txtnac"
+                                    required="obligatorio">
+                                    <td>{{ p.2 }} </td>
+                            </p>
+                        </tr>
+                        {% endfor %}
+                    </div>
+                </div>
+                <br>
+                <div
+                    class="w3-container w3-display-container w3-round w3-theme-l4 w3-border w3-theme-border w3-margin-bottom w3-hide-small">
+
+                    <p><strong>Atención</strong></p>
+                    <p><b>
+                            Fono Call Center
+                            <br>
+                            <br>
+                            +569 7777 7777
+                            <br>
+                            <br>
+                            +562 2222 2222</b>
+                    </p>
+                </div>
+
+                <!-- End Left Column -->
+            </div>
+
+            <!-- Middle Column -->
+            <div class="w3-col m7">
+
+                <div class="w3-row-padding">
+                    <div class="w3-col m12">
+                        <div class="w3-card w3-round w3-white">
+                            <div class="w3-container w3-padding">
+                                <h3 class="w3-center"><b>Consulte su información</b></h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ASESORIAS -->
+                <div class="w3-container w3-card w3-white w3-round w3-margin"><br>
+                    <img src="/static/img/Isotipo.png" alt="Avatar" class="w3-left w3-circle w3-margin-right"
+                        style="width:60px">
+                    <h4><b>Mis Asesorías</b></h4>
+                    <hr class="w3-clear">
+                    <p>Solicite asesoría con nuestros operadores aquí:</p>
+                    <form action="{% url 'solicitarAsesoria' %}" id="solicitarAsesoria" method="post">
+                        {% csrf_token %}
+                        <div class="w3-section">
+                            <label>
+                                <h4>RUT Empresa</h4>
+                            </label>
+                            <input class="w3-input w3-border" type="text" name="asesRutEmpresa" id="asesRutEmpresa" placeholder="00.000.000-0"
+                                required>
+                        </div>
+                        <div class="w3-section">
+                            <label>
+                                <h4>Nombre Empresa</h4>
+                            </label>
+                            <input class="w3-input w3-border" type="text" name="asesNombreEmpresa" id="asesNombreEmpresa"
+                                placeholder="Empresa ..." required>
+                        </div>
+                        <div class="w3-section">
+                            <label>
+                                <h4>Teléfono Contacto</h4>
+                            </label>
+                            <input class="w3-input w3-border" type="text" name="asesFono" id="asesFono" placeholder="+569XXXXXXXX"
+                                required>
+                        </div>
+                        <div class="w3-section">
+                            <label>
+                                <h4>Email Contacto</h4>
+                            </label>
+                            <input class="w3-input w3-border" type="text" name="asesEmail" id="asesEmail" placeholder="correo@correo.cl"
+                                required>
+                        </div>
+                        <button type="submit" class="w3-button w3-block w3-padding-6 w3-blue w3-margin-bottom">
+                            <h5>Solicitar Asesoría</h5>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- CONTRATOS -->
+                <div class="w3-container w3-card w3-white w3-round w3-margin"><br>
+                    <img src="/static/img/Isotipo.png" alt="Avatar" class="w3-left w3-circle w3-margin-right"
+                        style="width:60px">
+                    <h4><b>Mis Contratos</b></h4>
+                    <hr class="w3-clear">
+                    <div class="w3-responsive" style="padding-bottom: 5%;">
+                        <table class="w3-table-all">
+                            <tr class="w3-centre">
+                                <th>Fecha Contrato</th>
+                                <th>ID Contrato</th>
+                                <th>Fecha Pago</th>
+                                <th>Plan</th>
+                                <th>Rut Empresa</th>
+                            </tr>
+                            {% for p in contratoscli%}
+                            <tr>
+                                <p>
+                                    <td>{{ p.0 }} </td>
+                                </p>
+                                <p>
+                                    <td>{{ p.1 }} </td>
+                                </p>
+                                <p>
+                                    <td>{{ p.2 }} </td>
+                                </p>
+                                <p>
+                                    <td>{{ p.3 }} </td>
+                                </p>
+                                <p>
+                                    <td>{{ p.4 }} </td>
+                                </p>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+
+                <!-- PAGOS
+                <div class="w3-container w3-card w3-white w3-round w3-margin"><br>
+                    <img src="/static/img/Isotipo.png" alt="Avatar" class="w3-left w3-circle w3-margin-right"
+                        style="width:60px">
+                    <h4><b>Pago de Contrato</b></h4>
+                    <hr class="w3-clear">
+                    <div class="w3-section">
+                        <label>
+                            <h4>A la fecha usted debe:</h4>
+                        </label>
+                        <input class="w3-input w3-border" type="text" name="montoPago" placeholder="$0.000" readonly>
+                    </div>
+                    <div class="w3-section">
+                        <label for="medioPago">
+                            <h4>Método de Pago:</h4>
+                        </label>
+                        <select id="medioPago" class="w3-input w3-border">
+                            <option value="0">Seleccione</option>
+                            <option value="1">WebPay</option>
+                            <option value="2">Transferencia</option>
+                        </select>
+                    </div>
+                </div>
+
+                REPORTAR -->
+                <div class="w3-container w3-card w3-white w3-round w3-margin"><br>
+                    <img src="/static/img/Isotipo.png" alt="Avatar" class="w3-left w3-circle w3-margin-right"
+                        style="width:60px">
+                    <h4><b>Reportar Accidente</b></h4>
+                    <hr class="w3-clear">
+                    <p>Puede reportar un accidente ocurrido en su empresa <br> Uno de nuestros profesionales se
+                        contactará con usted tan pronto como sea posible.</p>
+                    <form action="{% url 'reportarAccidente' %}" id="reportarAccidente" method="post">
+                        {% csrf_token %}
+                        <div class="w3-section">
+                            <label>
+                                <h4>RUT Empresa</h4>
+                            </label>
+                            <input class="w3-input w3-border" type="text" name="reporteRutEmpresa" id="reporteRutEmpresa"
+                                placeholder="00.000.000-0" required>
+                        </div>
+                        <div class="w3-section">
+                            <label>
+                                <h4>Nombre Empresa</h4>
+                            </label>
+                            <input class="w3-input w3-border" type="text" name="reporteNombreEmpresa" id="reporteNombreEmpresa"
+                                placeholder="Empresa ..." required>
+                        </div>
+                        <div class="w3-section">
+                            <label>
+                                <h4>Teléfono Contacto</h4>
+                            </label>
+                            <input class="w3-input w3-border" type="text" name="reporteFono" id="reporteFono" placeholder="+569XXXXXXXX"
+                                required>
+                        </div>
+                        <div class="w3-section">
+                            <label>
+                                <h4>Email Contacto</h4>
+                            </label>
+                            <input class="w3-input w3-border" type="text" name="reporteEmail" id="reporteEmail"
+                                placeholder="correo@correo.cl" required>
+                        </div>
+                        <div class="w3-section">
+                            <label>
+                                <h4>Accidente</h4>
+                            </label>
+                            <input class="w3-input w3-border" type="text" name="reporteDescAccidente" id="reporteDescAccidente"
+                                placeholder="Describa brevemente lo ocurrido" required>
+                        </div>
+                        <button type="submit" class="w3-button w3-block w3-padding-6 w3-blue w3-margin-bottom">
+                            <h5>Notificar Ahora</h5>
+                        </button>
+                    </form>
+                    
+                </div>
+
+                <!-- End Middle Column -->
+            </div>
+
+            <!-- Right Column -->
+            <div class="w3-col m2">
+                <div class="w3-card w3-round w3-white w3-center">
+                    <div class="w3-container">
+                        <p>Actividades Cercanas:</p>
+                        <img src="/static/img/monitoreo.jpg" style="width:100%;">
+                        <p><strong>Supervisión</strong></p>
+                        <p>Viernes 15:00</p>
+                    </div>
+                </div>
+                <br>
+
+                <div class="w3-card w3-round w3-white w3-padding-16 w3-center">
+                    <img src="/static/img/publi.jpg" style="width: 100%;">
+                </div>
+                <br>
+
+                <!-- End Right Column -->
+            </div>
+
+            <!-- End Grid -->
+        </div>
+
+        <!-- End Page Container -->
+    </div>
+    <br>
+
+    <!-- Footer -->
+    <footer>
+        <div class="w3-light-grey w3-container w3-padding-32" style="margin-top:58px;padding-right:58px">
+            <p class="w3-right">© 2021 Copyright: No Más Accidentes</p>
+        </div>
+    </footer>
+
+
+    <script>
+        // Accordion
+        function myFunction(id) {
+            var x = document.getElementById(id);
+            if (x.className.indexOf("w3-show") == -1) {
+                x.className += " w3-show";
+                x.previousElementSibling.className += " w3-theme-d1";
+            } else {
+                x.className = x.className.replace("w3-show", "");
+                x.previousElementSibling.className =
+                    x.previousElementSibling.className.replace(" w3-theme-d1", "");
+            }
+        }
+
+        // Used to toggle the menu on smaller screens when clicking on the menu button
+        function openNav() {
+            var x = document.getElementById("navDemo");
+            if (x.className.indexOf("w3-show") == -1) {
+                x.className += " w3-show";
+            } else {
+                x.className = x.className.replace(" w3-show", "");
+            }
+        }
+    </script>
+
+</body>
+
+</html>

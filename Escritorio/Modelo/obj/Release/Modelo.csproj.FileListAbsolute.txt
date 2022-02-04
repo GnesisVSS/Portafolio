@@ -1,0 +1,11 @@
+C:\Users\skrac\Documents\GitHub\Portafolio\Escritorio\Modelo\bin\Release\Modelo.dll
+C:\Users\skrac\Documents\GitHub\Portafolio\Escritorio\Modelo\bin\Release\Modelo.pdb
+C:\Users\skrac\Documents\GitHub\Portafolio\Escritorio\Modelo\bin\Release\MaterialDesignColors.dll
+C:\Users\skrac\Documents\GitHub\Portafolio\Escritorio\Modelo\bin\Release\MaterialDesignThemes.Wpf.dll
+C:\Users\skrac\Documents\GitHub\Portafolio\Escritorio\Modelo\bin\Release\MaterialDesignColors.pdb
+C:\Users\skrac\Documents\GitHub\Portafolio\Escritorio\Modelo\bin\Release\MaterialDesignThemes.Wpf.pdb
+C:\Users\skrac\Documents\GitHub\Portafolio\Escritorio\Modelo\bin\Release\MaterialDesignThemes.Wpf.xml
+C:\Users\skrac\Documents\GitHub\Portafolio\Escritorio\Modelo\obj\Release\Modelo.csproj.CoreCompileInputs.cache
+C:\Users\skrac\Documents\GitHub\Portafolio\Escritorio\Modelo\obj\Release\Modelo.csproj.CopyComplete
+C:\Users\skrac\Documents\GitHub\Portafolio\Escritorio\Modelo\obj\Release\Modelo.dll
+C:\Users\skrac\Documents\GitHub\Portafolio\Escritorio\Modelo\obj\Release\Modelo.pdb
