@@ -1,7 +1,0 @@
-pillow
-django-admin-interface
-django-crispy-forms
-django-rest-framework
-django-pwa
-django-admin-interface
-fcm-django

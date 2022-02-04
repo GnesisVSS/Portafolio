@@ -1,0 +1,1274 @@
+--------------------------------------------------------
+--  DDL for Function FN_ASESORIA_LISTA
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_ASESORIA_LISTA" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT IDASESORIA ,a.RUTEMP,Nombreemp  FROM ASESORIA a join empresa e on a.rutemp = e.rutemp;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_ASESORIAYPLAN
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_ASESORIAYPLAN" (v_nombre VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT rutemp || '' || digitoveriemp , nombreemp  
+FROM empresa 
+WHERE lower(nombreemp) = lower(v_nombre) or lower(nombreemp) like(lower('%' || v_nombre ||'%'));
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_CAPACITACIONES
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_CAPACITACIONES" (V_NOMBRE VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT nombreemp FROM empresa 
+                        WHERE LOWER(nombreemp) = LOWER(V_NOMBRE) or LOWER(nombreemp) 
+                        LIKE(LOWER( '%' || V_NOMBRE || '%'));
+    RETURN L_CURSOR;
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_EMPLEADO
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_EMPLEADO" (V_RUT VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT pnombreprf || ' ' || apellidopatprf || ' ' || apellidomatprf 
+                    FROM profesional 
+WHERE runprf || digitoverificadorprf = V_RUT or runprf || '-' || digitoverificadorprf = V_RUT  or runprf = V_RUT  or runprf LIKE( '%' || V_RUT || '%');
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_EMPLEADO_GESTIONACT
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_EMPLEADO_GESTIONACT" (V_NOMBRE_PROFESIONAL VARCHAR2) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select p.pnombreprf || ' ' || p.apellidopatprf,nombreemp,nvl(count(idasesoria),0),nvl(count(idvisita),0),nvl(count(c.idcapacitacion),0) 
+                        from profesional p 
+                        join asesoria a  on p.runprf = a.runprf  
+                        join empresa e on a.rutemp = e.rutemp 
+                        left join visitas v on e.rutemp = v.rutemp 
+                        left join capacitaciones c on c.rutemp = e.rutemp 
+                        group by p.runprf, nombreemp, p.pnombreprf || ' ' || p.apellidopatprf 
+                        having  LOWER(nombreemp) like (LOWER( '%' || V_NOMBRE_PROFESIONAL || '%'));
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_EMPRESA_GESTIONACT
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_EMPRESA_GESTIONACT" (V_NOMBRE VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select p.pnombreprf || ' ' || p.apellidopatprf, nombreemp, nvl(count(idasesoria), 0), nvl(count(idvisita), 0), 
+                        nvl(count(c.idcapacitacion), 0) 
+                        from profesional p 
+                        join asesoria a  on p.runprf = a.runprf  
+                        join empresa e on a.rutemp = e.rutemp 
+                        left join visitas v on e.rutemp = v.rutemp 
+                        left join capacitaciones c on c.rutemp = e.rutemp 
+                        group by p.runprf, nombreemp, p.pnombreprf || ' ' || p.apellidopatprf 
+                        having LOWER(p.pnombreprf || ' ' || p.apellidopatprf) = LOWER(V_NOMBRE) 
+                        or LOWER(p.pnombreprf || ' ' || p.apellidopatprf) LIKE(LOWER('%' || V_NOMBRE|| '%'));
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_EMPRESA_GESTIONCONTRATO
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_EMPRESA_GESTIONCONTRATO" (V_NOMBRE VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT  distinct( c.idcontrato),ase.runprf,pro.pnombreprf || ' ' || pro.apellidopatprf,ase.idasesoria,RUTREPRESENT,DESCCONTRATO,NVL(FECHAPAGO,'PENDIENTE'),CANTVISITAS,pl.cantcapacitacion,pl.cantasesorias,
+                        NVL(p.estadopago,'PENDIENTE'),e.nombreemp
+                        FROM EMPRESA E
+                        JOIN CONTRATO C 
+                        ON e.rutemp = c.rutemp
+                        FULL JOIN PAGOPLAN P
+                        ON c.idcontrato = p.idcontrato
+                        JOIN ASESORIA ASE
+                        ON ase.rutemp = e.rutemp
+                        JOIN PLAN PL 
+                        ON ase.idasesoria = pl.idasesoria
+                        JOIN PROFESIONAL PRO
+                        ON ase.runprf = pro.runprf
+                        WHERE LOWER(e.nombreemp) = LOWER(V_NOMBRE) or LOWER(e.nombreemp) LIKE(LOWER( '%' || V_NOMBRE || '%'));
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_EMPRESA_GESTIONCONTRATO_PROF
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_EMPRESA_GESTIONCONTRATO_PROF" (V_NOMBRE VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT  distinct( c.idcontrato),ase.runprf,pro.pnombreprf || ' ' || pro.apellidopatprf,ase.idasesoria,RUTREPRESENT,DESCCONTRATO,NVL(FECHAPAGO,'PENDIENTE'),CANTVISITAS,pl.cantcapacitacion,pl.cantasesorias,
+                        NVL(p.estadopago,'PENDIENTE'),e.nombreemp
+                        FROM EMPRESA E
+                        JOIN CONTRATO C 
+                        ON e.rutemp = c.rutemp
+                        FULL JOIN PAGOPLAN P
+                        ON c.idcontrato = p.idcontrato
+                        JOIN ASESORIA ASE
+                        ON ase.rutemp = e.rutemp
+                        JOIN PLAN PL 
+                        ON ase.idasesoria = pl.idasesoria
+                        JOIN PROFESIONAL PRO
+                        ON ase.runprf = pro.runprf
+                        WHERE LOWER(e.nombreemp) LIKE(LOWER( '%' || V_NOMBRE || '%')) AND ase.runprf = (SELECT RUNPRF 
+                        FROM PERFIL 
+                        where idperfil = (select max(idperfil) from perfil) and ROWNUM = 1
+                        );
+
+    RETURN L_CURSOR;
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_EMPRESA_RUTREPRE_GESTIONCONTRATO
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_EMPRESA_RUTREPRE_GESTIONCONTRATO" (V_RUT NUMBER,V_NOMBRE VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT  distinct( c.idcontrato),ase.runprf,pro.pnombreprf || ' ' || pro.apellidopatprf,ase.idasesoria,RUTREPRESENT,DESCCONTRATO,NVL(FECHAPAGO,'PENDIENTE'),CANTVISITAS,pl.cantcapacitacion,pl.cantasesorias,
+                        NVL(p.estadopago,'PENDIENTE'),e.nombreemp
+                        FROM EMPRESA E
+                        JOIN CONTRATO C 
+                        ON e.rutemp = c.rutemp
+                        FULL JOIN PAGOPLAN P
+                        ON c.idcontrato = p.idcontrato
+                        JOIN ASESORIA ASE
+                        ON ase.rutemp = e.rutemp
+                        JOIN PLAN PL 
+                        ON ase.idasesoria = pl.idasesoria
+                        JOIN PROFESIONAL PRO
+                        ON ase.runprf = pro.runprf
+                        WHERE  rutrepresent like('%' || V_RUT || '%') and  LOWER(nombreemp) LIKE(LOWER( '%' || V_NOMBRE || '%'));
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_EMPRESA_RUTREPRE_GESTIONCONTRATO_PROFESIONAL
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_EMPRESA_RUTREPRE_GESTIONCONTRATO_PROFESIONAL" (V_RUT NUMBER,V_NOMBRE VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT  distinct( c.idcontrato),ase.runprf,pro.pnombreprf || ' ' || pro.apellidopatprf,ase.idasesoria,RUTREPRESENT,DESCCONTRATO,NVL(FECHAPAGO,'PENDIENTE'),CANTVISITAS,pl.cantcapacitacion,pl.cantasesorias,
+                        NVL(p.estadopago,'PENDIENTE'),e.nombreemp
+                        FROM EMPRESA E
+                        JOIN CONTRATO C 
+                        ON e.rutemp = c.rutemp
+                        FULL JOIN PAGOPLAN P
+                        ON c.idcontrato = p.idcontrato
+                        JOIN ASESORIA ASE
+                        ON ase.rutemp = e.rutemp
+                        JOIN PLAN PL 
+                        ON ase.idasesoria = pl.idasesoria
+                        JOIN PROFESIONAL PRO
+                        ON ase.runprf = pro.runprf
+                        WHERE  rutrepresent like('%' || V_RUT || '%') and  LOWER(nombreemp) LIKE(LOWER( '%' || V_NOMBRE || '%')) and ase.runprf = (SELECT RUNPRF 
+                        FROM PERFIL 
+                        where idperfil = (select max(idperfil) from perfil) and ROWNUM = 1
+                        );
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_EMPRESA_Y_EMPLEADO_GESTIONACT
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_EMPRESA_Y_EMPLEADO_GESTIONACT" (V_NOMBRE_EMPLEADO VARCHAR,V_NOMBRE_EMPRESA VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select p.pnombreprf || ' ' || p.apellidopatprf,nombreemp,nvl(count(idasesoria),0),nvl(count(idvisita),0),nvl(count(c.idcapacitacion),0) 
+                        from profesional p 
+                        join asesoria a  on p.runprf = a.runprf  
+                        join empresa e on a.rutemp = e.rutemp 
+                        left join visitas v on e.rutemp = v.rutemp 
+                        left join capacitaciones c on c.rutemp = e.rutemp 
+                        group by p.runprf, nombreemp, p.pnombreprf || ' ' || p.apellidopatprf 
+                        having LOWER(p.pnombreprf || ' ' || p.apellidopatprf) LIKE(LOWER( '%' || V_NOMBRE_EMPLEADO|| '%')) 
+                        and  LOWER(nombreemp) like (LOWER( '%' || V_NOMBRE_EMPRESA || '%'));
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_NOMBRE_EMPRESA
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_NOMBRE_EMPRESA" (v_nombre VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT rutemp || '' || digitoveriemp , nombreemp  
+FROM empresa 
+WHERE lower(nombreemp) = lower(v_nombre) or lower(nombreemp) like(lower('%' || v_nombre ||'%'));
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_NOMBRE_EMPRESA_PROFESIONAL_VISITAS
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_NOMBRE_EMPRESA_PROFESIONAL_VISITAS" (v_nombre VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT nombreemp,rutemp
+FROM empresa 
+WHERE lower(nombreemp) = lower(v_nombre) or lower(nombreemp) like(lower('%' || v_nombre ||'%'));
+
+    RETURN L_CURSOR;
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_NOMBRE_EMPRESA_VISITA
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_NOMBRE_EMPRESA_VISITA" (v_nombre VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT v.idvisita,fechavisita,tipovisitas,estado,V.rutemp,runprf,emp.nombreemp
+                        FROM VISITAS V
+                        JOIN empresa EMP
+                        ON v.rutemp = emp.rutemp
+                        join registro reg
+                        on v.idvisita = reg.idvisita
+                        WHERE lower(emp.nombreemp) = lower(v_nombre) 
+                        or lower(emp.nombreemp) like(lower('%' || v_nombre ||'%'));
+
+    RETURN L_CURSOR;
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_NOMBRE_REP_REGISTROEMPRESA
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_NOMBRE_REP_REGISTROEMPRESA" (V_NOMBRE VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT to_number(rutrepresent || '' || digitoverirepresent) , (nombrerepre || ' ' || apellidorepre) 
+                        FROM representante 
+                        WHERE lower(nombrerepre || ' ' || apellidorepre) = V_NOMBRE 
+                        or lower(nombrerepre) = V_NOMBRE
+                        or lower(apellidorepre) = V_NOMBRE or LOWER(nombrerepre) LIKE(LOWER( '%' || V_NOMBRE || '%'));
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_REPRESENTANTE_GESTIONCONTRATO
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_REPRESENTANTE_GESTIONCONTRATO" (V_RUT NUMBER) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT  distinct( c.idcontrato),ase.runprf,pro.pnombreprf || ' ' || pro.apellidopatprf,ase.idasesoria,RUTREPRESENT,DESCCONTRATO,NVL(FECHAPAGO,'PENDIENTE'),CANTVISITAS,pl.cantcapacitacion,pl.cantasesorias,
+                        NVL(p.estadopago,'PENDIENTE'),e.nombreemp
+                        FROM EMPRESA E
+                        JOIN CONTRATO C 
+                        ON e.rutemp = c.rutemp
+                        FULL JOIN PAGOPLAN P
+                        ON c.idcontrato = p.idcontrato
+                        JOIN ASESORIA ASE
+                        ON ase.rutemp = e.rutemp
+                        JOIN PLAN PL 
+                        ON ase.idasesoria = pl.idasesoria
+                        JOIN PROFESIONAL PRO
+                        ON ase.runprf = pro.runprf
+                        WHERE  rutrepresent like(V_RUT || '%') or rutrepresent = V_RUT;
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_RUN_REP_REGISTROEMPRESA
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_RUN_REP_REGISTROEMPRESA" (V_RUT VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT to_number(rutrepresent || '' || digitoverirepresent) , (nombrerepre || ' ' || apellidorepre)  
+                        FROM representante
+                        WHERE to_number(rutrepresent || '' || digitoverirepresent) = V_RUT
+                        or rutrepresent = V_RUT or rutrepresent like('%' || V_RUT || '%');
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_RUN_REP_REPORTE_CLIENTE
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_RUN_REP_REPORTE_CLIENTE" (V_RUT VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select nombrerepre || ' ' || apellidorepre 
+                        from REPRESENTANTE 
+                        WHERE  rutrepresent || digitoverirepresent = V_RUT 
+                        or rutrepresent || '-' || digitoverirepresent = V_RUT 
+                        or rutrepresent = V_RUT 
+                        or rutrepresent LIKE( '%' || V_RUT || '%');
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_RUNEMPRESA_PLAN
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_RUNEMPRESA_PLAN" (V_RUT VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT IDASESORIA ,a.RUTEMP,Nombreemp  
+                        FROM ASESORIA a 
+                        join empresa e on a.rutemp = e.rutemp 
+                        where a.RUTEMP like(V_RUT || '%') or a.RUTEMP = V_RUT;
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_RUT_EMPRESA
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_RUT_EMPRESA" (V_RUT VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT rutemp || '' || digitoveriemp , nombreemp  
+FROM empresa 
+WHERE to_number(rutemp || '' || digitoveriemp) = V_RUT or rutemp = V_RUT or rutemp LIKE( '%' || V_RUT || '%');
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_RUT_EMPRESA_VISITA
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_RUT_EMPRESA_VISITA" (V_RUT VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT v.idvisita,fechavisita,tipovisitas,estado,V.rutemp,runprf,emp.nombreemp
+                        FROM VISITAS V
+                        JOIN empresa EMP
+                        ON v.rutemp = emp.rutemp
+                        join registro reg
+                        on v.idvisita = reg.idvisita
+                        WHERE V.rutemp = V_RUT 
+                        or V.rutemp LIKE( '%' || V_RUT || '%');
+
+    RETURN L_CURSOR;
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_RUT_PROFESIONAL_DATAGRID
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_RUT_PROFESIONAL_DATAGRID" (V_NOMBRE VARCHAR2) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select runprf || digitoverificadorprf  
+from profesional 
+where lower(pnombreprf || ' ' || apellidopatprf || ' ' || apellidomatprf) = lower(V_NOMBRE);
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_RUTREPRE_GESTIONCONTRATO
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_RUTREPRE_GESTIONCONTRATO" (V_RUT_REPRESENTANTE NUMBER) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT distinct( c.idcontrato),ase.runprf,pro.pnombreprf || ' ' || pro.apellidopatprf,ase.idasesoria,RUTREPRESENT,DESCCONTRATO,NVL(FECHAPAGO,'PENDIENTE'),CANTVISITAS,pl.cantcapacitacion,pl.cantasesorias,
+                        NVL(p.estadopago,'PENDIENTE'),e.nombreemp
+                        FROM EMPRESA E 
+                        JOIN CONTRATO C ON e.rutemp = c.rutemp 
+                        FULL JOIN PAGOPLAN P ON c.idcontrato = p.idcontrato 
+                        JOIN ASESORIA ASE  ON ase.rutemp = e.rutemp 
+                        JOIN PLAN PL ON ase.idasesoria = pl.idasesoria 
+                        JOIN PROFESIONAL PRO
+                        ON ase.runprf = pro.runprf
+                        WHERE  rutrepresent like(V_RUT_REPRESENTANTE || '%') or rutrepresent = V_RUT_REPRESENTANTE;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAR_RUTREPRE_GESTIONCONTRATO_PROFESIONAL
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAR_RUTREPRE_GESTIONCONTRATO_PROFESIONAL" (V_RUT_REPRESENTANTE NUMBER) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT distinct( c.idcontrato),ase.runprf,pro.pnombreprf || ' ' || pro.apellidopatprf,ase.idasesoria,RUTREPRESENT,DESCCONTRATO,NVL(FECHAPAGO,'PENDIENTE'),CANTVISITAS,pl.cantcapacitacion,pl.cantasesorias,
+                        NVL(p.estadopago,'PENDIENTE'),e.nombreemp
+                        FROM EMPRESA E 
+                        JOIN CONTRATO C ON e.rutemp = c.rutemp 
+                        FULL JOIN PAGOPLAN P ON c.idcontrato = p.idcontrato 
+                        JOIN ASESORIA ASE  ON ase.rutemp = e.rutemp 
+                        JOIN PLAN PL ON ase.idasesoria = pl.idasesoria 
+                        JOIN PROFESIONAL PRO
+                        ON ase.runprf = pro.runprf
+                        WHERE  rutrepresent like(V_RUT_REPRESENTANTE || '%') and ase.runprf = (SELECT RUNPRF 
+                        FROM PERFIL 
+                        where idperfil = (select max(idperfil) from perfil) and ROWNUM = 1
+                        );
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_BUSCAREMPRESA_PLAN
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_BUSCAREMPRESA_PLAN" (V_NOMBRE VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT IDASESORIA ,a.RUTEMP,Nombreemp  
+                        FROM ASESORIA a 
+                        join empresa e on a.rutemp = e.rutemp 
+                        where LOWER(Nombreemp) = LOWER(V_NOMBRE) or LOWER(Nombreemp) LIKE(LOWER( '%' || V_NOMBRE || '%'));
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_CAMBIO_CONTRASENA
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_CAMBIO_CONTRASENA" (V_RUT VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select runprf from profesional WHERE runprf || digitoverificadorprf = V_RUT;
+
+    RETURN L_CURSOR;
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_CAMBIO_REGISTRO
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_CAMBIO_REGISTRO" (V_ID_REGISTRO VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select idregistro from registro WHERE idregistro = V_ID_REGISTRO;
+
+    RETURN L_CURSOR;
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_CANTIDAD_ACT_CAPACITACIONES
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_CANTIDAD_ACT_CAPACITACIONES" (V_EMPRESA IN VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select count(idcapacitacion)
+from capacitaciones 
+WHERE rutemp = V_EMPRESA;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_CANTIDAD_ACT_VISITAS
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_CANTIDAD_ACT_VISITAS" (V_EMPRESA IN VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT count(idvisita)
+from visitas 
+WHERE rutemp = V_EMPRESA;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_CAPACITACIONES_ACTIVAS
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_CAPACITACIONES_ACTIVAS" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select COUNT(idcapacitacion)
+from capacitaciones 
+WHERE estado='EN CAPACITACION';
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_CAPACITACIONES_ACTIVAS_CLIENTE
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_CAPACITACIONES_ACTIVAS_CLIENTE" (V_EMPRESA IN VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select COUNT(idcapacitacion)
+from capacitaciones 
+WHERE estado='EN CAPACITACION' AND rutemp = V_EMPRESA;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_CAPACITACIONES_CERRADAS
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_CAPACITACIONES_CERRADAS" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select COUNT(idcapacitacion)
+from capacitaciones 
+WHERE estado='CERRADA';
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_CAPACITACIONES_CERRADAS_CLIENTE
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_CAPACITACIONES_CERRADAS_CLIENTE" (V_EMPRESA IN VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select COUNT(idcapacitacion)
+from capacitaciones 
+WHERE estado='CERRADA' AND rutemp = V_EMPRESA;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_CAPACITACIONES_PENDIENTES_CLIENTE
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_CAPACITACIONES_PENDIENTES_CLIENTE" (V_EMPRESA IN VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select COUNT(idcapacitacion)
+from capacitaciones 
+WHERE estado='PENDIENTE' AND rutemp = V_EMPRESA;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_CAPACITACIONES_PENDIENTES
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_CAPACITACIONES_PENDIENTES" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select COUNT(idcapacitacion)
+from capacitaciones 
+WHERE estado='PENDIENTE';
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_CAPACITACIONES_TOTAL
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_CAPACITACIONES_TOTAL" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT COUNT(IDCAPACITACION)
+                        FROM CAPACITACIONES;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_CLIENTES_ACTIVOS
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_CLIENTES_ACTIVOS" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select count(desccontrato)
+from contrato
+where desccontrato != 'Inactivo';
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_CLIENTES_INACTIVOS
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_CLIENTES_INACTIVOS" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select count(desccontrato)
+from contrato
+where desccontrato = 'Inactivo';
+    RETURN L_CURSOR;
+END;
+
+--ESTADISTICAS CAPACITACIONES
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_CLIENTES_TOTAL
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_CLIENTES_TOTAL" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT count(rutemp)
+                        FROM EMPRESA;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_COMUNA
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_COMUNA" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select nombrecomuna
+from comuna;
+    RETURN L_CURSOR;
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_CONTRASENA_PRF
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_CONTRASENA_PRF" (V_PASS VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT contrasenaprf
+                    FROM PROFESIONAL
+                    WHERE contrasenaprf = V_PASS;
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_CONTRATO
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_CONTRATO" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT rutemp || '' || digitoveriemp,nombreemp  FROM empresa;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_CONTRATOS_TOTAL
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_CONTRATOS_TOTAL" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select count(desccontrato)
+                        from contrato;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_DATOS_REGISTRO
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_DATOS_REGISTRO" (V_ID NUMBER) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT idregistro,item1, item2, item3,nvl( comentarioitem1,'aun no disponible'), nvl(comentarioitem2,'aun no disponible'),nvl(comentarioitem3,'aun no disponible') ,nvl(itemextra1,'aun no disponible') , nvl(itemextra2,'aun no disponible'),
+nvl(itemextra3,'aun no disponible'), nvl(comentarioitemextra1,'aun no disponible'), nvl(comentarioitemextra2,'aun no disponible'),nvl(comentarioitemextra3,'aun no disponible') , descripcionitem1, descripcionitem2,
+descripcionitem3, nvl(descripcionitem1extra,'aun no disponible'),nvl(descripcionitem2extra,'aun no disponible'),nvl(descripcionitem3extra,'aun no disponible') 
+FROM registro WHERE idvisita = V_ID;
+    RETURN L_CURSOR;
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_GESTION_ACT
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_GESTION_ACT" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT p.pnombreprf || ' ' || p.apellidopatprf,nombreemp,nvl(count(idasesoria),0),nvl(count(idvisita),0),nvl(count(c.idcapacitacion),0)
+                        from profesional p
+                        join asesoria a 
+                        on p.runprf = a.runprf 
+                        join empresa e
+                        on a.rutemp = e.rutemp
+                        left join visitas v
+                        on e.rutemp = v.rutemp
+                        left join capacitaciones c
+                        on c.rutemp = e.rutemp
+                        group by p.runprf, nombreemp, p.pnombreprf || ' ' || p.apellidopatprf;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_GESTION_CONTRATO
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_GESTION_CONTRATO" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT  distinct( c.idcontrato),ase.runprf,pro.pnombreprf || ' ' || pro.apellidopatprf,ase.idasesoria,RUTREPRESENT,DESCCONTRATO,NVL(FECHAPAGO,'PENDIENTE'),CANTVISITAS,pl.cantcapacitacion,pl.cantasesorias,
+                        NVL(p.estadopago,'PENDIENTE'),e.nombreemp
+                        FROM EMPRESA E
+                        JOIN CONTRATO C 
+                        ON e.rutemp = c.rutemp
+                        FULL JOIN PAGOPLAN P
+                        ON c.idcontrato = p.idcontrato
+                        JOIN ASESORIA ASE
+                        ON ase.rutemp = e.rutemp
+                        JOIN PLAN PL 
+                        ON ase.idasesoria = pl.idasesoria
+                        JOIN PROFESIONAL PRO
+                        ON ase.runprf = pro.runprf
+                        order by c.idcontrato;
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_GESTION_CONTRATO_PROFESIONAL
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_GESTION_CONTRATO_PROFESIONAL" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT  distinct( c.idcontrato),ase.runprf,pro.pnombreprf || ' ' || pro.apellidopatprf,ase.idasesoria,RUTREPRESENT,DESCCONTRATO,NVL(FECHAPAGO,'PENDIENTE'),CANTVISITAS,pl.cantcapacitacion,pl.cantasesorias,
+                        NVL(p.estadopago,'PENDIENTE'),e.nombreemp
+                        FROM EMPRESA E
+                        JOIN CONTRATO C 
+                        ON e.rutemp = c.rutemp
+                        FULL JOIN PAGOPLAN P
+                        ON c.idcontrato = p.idcontrato
+                        JOIN ASESORIA ASE
+                        ON ase.rutemp = e.rutemp
+                        JOIN PLAN PL 
+                        ON ase.idasesoria = pl.idasesoria
+                        JOIN PROFESIONAL PRO
+                        ON ase.runprf = pro.runprf
+                        where ase.runprf = (SELECT RUNPRF 
+                        FROM PERFIL 
+                        where idperfil = (select max(idperfil) from perfil) and ROWNUM = 1
+                        );
+    RETURN L_CURSOR;
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_INFO_REPORTE_CLIENTE
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_INFO_REPORTE_CLIENTE" (v_nombre in varchar) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR ;
+BEGIN
+    OPEN L_CURSOR FOR  select e.rutemp,nombreemp,re.nombrerepre || ' ' || re.apellidorepre, re.rutrepresent
+                        from empresa e
+                        join representante re
+                        on re.rutrepresent = e.rutrepresent
+                        where re.nombrerepre || ' ' || re.apellidorepre = v_nombre;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_INICIO_SESION_ADMIN
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_INICIO_SESION_ADMIN" (v_usuario varchar,v_pass varchar) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select contrasenaprf,runprf
+                    from profesional 
+                    WHERE contrasenaprf = v_pass 
+                    AND runprf = v_usuario 
+                    AND IDPROFESION = 4;
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_INICIO_SESION_PROFESIONAL
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_INICIO_SESION_PROFESIONAL" (v_usuario varchar,v_pass varchar) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select contrasenaprf,runprf
+                    from profesional 
+                    WHERE contrasenaprf = v_pass 
+                    AND runprf = v_usuario 
+                    AND IDPROFESION != 4;
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_LISTAR_ASESORIA
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_LISTAR_ASESORIA" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT IDASESORIA,FECHAASESORIA,CANTACCIDENTES,TASAACCIDENTES,RUTEMP,VALORASESORIA,RUNPRF
+                        FROM asesoria
+                        where RUNPRF = (SELECT RUNPRF 
+                        FROM PERFIL 
+                        where idperfil = (select max(idperfil) from perfil) and ROWNUM = 1
+                        );
+    RETURN L_CURSOR;
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_LISTAR_ASESORIA_BUSCAR
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_LISTAR_ASESORIA_BUSCAR" (V_RUN VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT IDASESORIA,FECHAASESORIA,CANTACCIDENTES,TASAACCIDENTES,RUTEMP,VALORASESORIA,RUNPRF
+                        FROM asesoria
+                        where RUNPRF = (SELECT RUNPRF 
+                        FROM PERFIL 
+                        where idperfil = (select max(idperfil) from perfil) and ROWNUM = 1
+                        ) AND RUTEMP = V_RUN;
+    RETURN L_CURSOR;
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_LISTAR_VISITAS
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_LISTAR_VISITAS" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT IDVISITA,FECHAVISITA,TIPOVISITAS,ESTADO,RUTEMP
+                        FROM VISITAS;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_MOSTRAR_RUT_EMPLEADO
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_MOSTRAR_RUT_EMPLEADO" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT RUNPRF || DIGITOVERIFICADORPRF FROM PROFESIONAL ;
+    RETURN L_CURSOR;
+END;
+
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_PERFIL
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_PERFIL" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT PNOMBREPRF || ' ' || APELLIDOPATPRF,p.RUNPRF,to_char(EDADPRF),CORREOPRF,TELEFONOPRF,FECHANACPRF,DIRECCIONPRF,to_char(EXPERIENCIAPRF),FECHACONTRATAPRF,PR_DESCRIPCION,PAISNACIMIENTOPRF,DESCJORNADA,DESCSEXO
+FROM PROFESIONAL P
+ JOIN PROFESION PROFE
+ON P.IDPROFESION = PROFE.IDPROFESION
+ JOIN JORNADA J
+ON p.idjornada = j.idjornada
+ JOIN GENERO G
+ON p.idsexo = g.idsexo
+ join perfil per
+on per.runprf = p.runprf
+WHERE p.RUNPRF = 
+(SELECT RUNPRF 
+FROM PERFIL 
+where idperfil = (select max(idperfil) from perfil) and ROWNUM = 1
+) and ROWNUM = 1;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_PROFESIONALES_TOTAL
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_PROFESIONALES_TOTAL" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT COUNT(runprf)
+                        FROM PROFESIONAL;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_REPORTE_GLOBAL
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_REPORTE_GLOBAL" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select count(rutemp),p.pnombreprf || ' ' || p.apellidopatprf
+from asesoria a
+full join profesional p
+on a.runprf = p.runprf
+group by p.pnombreprf || ' ' || p.apellidopatprf;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_REPRESENTANTE
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_REPRESENTANTE" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT to_number(rutrepresent || '' || digitoverirepresent) ,nombrerepre || ' ' || apellidorepre FROM representante;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_RUN_EMPRESA
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_RUN_EMPRESA" (V_RUN VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT rutemp
+FROM EMPRESA WHERE RUTEMP = V_RUN;
+    RETURN L_CURSOR;
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_RUN_PROFESIONAL
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_RUN_PROFESIONAL" (V_RUN VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT runprf
+FROM PROFESIONAL WHERE runprf = V_RUN;
+    RETURN L_CURSOR;
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_RUN_REPRESENTANTE
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_RUN_REPRESENTANTE" (V_RUN VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT rutrepresent
+FROM REPRESENTANTE WHERE rutrepresent = V_RUN;
+    RETURN L_CURSOR;
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_RUT_PRF
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_RUT_PRF" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT RUNPRF||DIGITOVERIFICADORPRF
+                    FROM PROFESIONAL;
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_TIPO_PLAN
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_TIPO_PLAN" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select descripcionplan
+from TIPOPLAN;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_USUARIO_PRF
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_USUARIO_PRF" (V_USUARIO VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT RUNPRF
+                    FROM PROFESIONAL WHERE RUNPRF = V_USUARIO;
+
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_VALOR_PLAN
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_VALOR_PLAN" (V_IDTIPOPLAN VARCHAR)RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT VALORPLAN
+                        FROM TIPOPLAN
+                        WHERE idtipoplan = V_IDTIPOPLAN;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_VISITAS_ACTIVAS
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_VISITAS_ACTIVAS" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select COUNT(idvisita)
+from visitas 
+WHERE estado='EN EJECUCIÓN';
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_VISITAS_ACTIVAS_CLIENTE
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_VISITAS_ACTIVAS_CLIENTE" (V_EMPRESA IN VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select COUNT(idvisita)
+from visitas 
+WHERE estado='EN EJECUCIÓN' AND rutemp = V_EMPRESA;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_VISITAS_CERRADA
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_VISITAS_CERRADA" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select COUNT(idvisita)
+from visitas 
+WHERE estado='COMPLETADA';
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_VISITAS_CERRADA_CLIENTE
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_VISITAS_CERRADA_CLIENTE" (V_EMPRESA IN VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select COUNT(idvisita)
+from visitas 
+WHERE estado='COMPLETADA' AND rutemp = V_EMPRESA;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_VISITAS_PENDIENTE
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_VISITAS_PENDIENTE" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select COUNT(idvisita)
+from visitas 
+WHERE estado='PENDIENTE';
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_VISITAS_PENDIENTE_CLIENTE
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_VISITAS_PENDIENTE_CLIENTE" (V_EMPRESA IN VARCHAR) RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR select COUNT(idvisita)
+from visitas 
+WHERE estado='PENDIENTE' AND rutemp = V_EMPRESA;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_VISITAS_TOTAL
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_VISITAS_TOTAL" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT COUNT(idvisita)
+                        FROM VISITAS;
+    RETURN L_CURSOR;
+END;
+
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_VISITAS_VISTA
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_VISITAS_VISTA" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT v.idvisita,fechavisita,tipovisitas,estado,V.rutemp,runprf,emp.nombreemp
+                        FROM VISITAS V
+                        JOIN empresa EMP
+                        ON v.rutemp = emp.rutemp
+                        join registro reg
+                        on v.idvisita = reg.idvisita;
+    RETURN L_CURSOR;
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Function FN_VISITAS_VISTA_BUSQUEDA
+--------------------------------------------------------
+
+  CREATE OR REPLACE NONEDITIONABLE FUNCTION "PORTAFOLIO"."FN_VISITAS_VISTA_BUSQUEDA" RETURN SYS_REFCURSOR IS
+    L_CURSOR SYS_REFCURSOR;
+BEGIN
+    OPEN L_CURSOR FOR SELECT v.idvisita,fechavisita,tipovisitas,estado,V.rutemp,runprf,emp.nombreemp
+                        FROM VISITAS V
+                        JOIN empresa EMP
+                        ON v.rutemp = emp.rutemp;
+    RETURN L_CURSOR;
+END;
+
+/

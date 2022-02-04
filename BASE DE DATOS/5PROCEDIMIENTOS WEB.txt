@@ -1,0 +1,107 @@
+PROCEDIMIENTOS ALMACENADOS WEB
+
+create or replace procedure sp_actualizarchecklistprof(v_id varchar,
+v_com1 varchar,v_com2 VARCHAR,v_com3 VARCHAR,v_comext1 varchar,v_comext2 varchar, v_comext3 varchar)
+is
+
+begin
+    
+    update (select r.comentarioitem1, r.comentarioitem2, r.comentarioitem3,
+    r.comentarioitemextra1, r.comentarioitemextra2, r.comentarioitemextra3
+    from registro r inner join visitas v
+    on r.idvisita=v.idvisita
+    where v.runprf=v_id)
+    
+    
+    set comentarioitem1=v_com1, comentarioitem2=v_com2, comentarioitem3=v_com3,
+    comentarioitemextra1=v_comext1, comentarioitemextra2=v_comext2, comentarioitemextra3=v_comext3;
+end;
+
+
+create or replace procedure sp_asesoriasprof(asesorias out SYS_REFCURSOR,v_id varchar)
+is
+begin
+    open asesorias for select r.rutrepresent||'-'||digitoverirepresent rutcli, idasesoria, to_char(a.fechaasesoria,'dd/mm/yyyy'), correoemp, telefonoemp, nombreemp from asesoria a 
+inner join empresa e on a.rutemp = e.rutemp 
+inner join representante r on e.rutrepresent = r.rutrepresent where a.runprf = v_id;
+end;
+
+
+/
+
+
+create or replace procedure sp_capacitacionesprf(capacitaciones out SYS_REFCURSOR,v_id varchar)
+is
+begin
+    open capacitaciones for select idcapacitacion, r.rutrepresent||'-'||r.digitoverirepresent, fechacapacitacion, horacapacitacion, cantasistentes, nombreemp, estado from capacitaciones c 
+    inner join empresa e on e.rutemp = c.rutemp 
+    inner join representante r on e.rutrepresent = r.rutrepresent where c.runprf = v_id;
+end;
+
+/
+
+
+create or replace procedure sp_checklistprof(registro out SYS_REFCURSOR, v_id varchar)
+is
+begin
+    open registro for select r.descripcionitem1,r.comentarioitem1,
+    r.descripcionitem2,r.comentarioitem2,
+    r.descripcionitem3,r.comentarioitem3,
+    r.descripcionitem1extra,r.comentarioitemextra1,
+    r.descripcionitem2extra,r.comentarioitemextra2,
+    r.descripcionitem3extra,r.comentarioitemextra3
+    from registro r inner join visitas v
+    on r.idvisita=v.idvisita
+    where v.runprf=v_id;
+end;
+
+
+/
+
+
+create or replace procedure sp_contratoscli(contrato out SYS_REFCURSOR,v_id varchar)
+is
+begin
+    open contrato for select c.fechainiciocontrato, c.idcontrato,pp.fechapago,p.nombreplan, c.rutemp 
+from contrato c inner join empresa e on c.rutemp = e.rutemp 
+inner join asesoria a on a.rutemp = e.rutemp 
+inner join plan p on p.idasesoria = a.idasesoria 
+inner join pagoplan pp on p.idplan = pp.idplan 
+inner join representante r on r.rutrepresent = e.rutrepresent
+where r.rutrepresent=v_id;
+end;
+
+
+/
+
+
+create or replace procedure sp_datoscli(cliente out SYS_REFCURSOR,v_id varchar)
+is
+begin
+    open cliente for select nombrerepre||' '||apellidorepre, cargorepre, numeroreprese from representante where rutrepresent = v_id;
+end;
+
+
+
+/
+
+
+create or replace PROCEDURE sp_datosprof(profesional out SYS_REFCURSOR,v_id VARCHAR)
+is
+begin 
+    open profesional for select pnombreprf||' '||apellidopatprf||' '||apellidomatprf, direccionprf, fechanacprf from profesional where runprf = v_id;
+end;
+
+
+
+/
+
+
+
+create or replace procedure sp_visitasprof(visitas out SYS_REFCURSOR,v_id varchar)
+is
+begin
+    open visitas for select idvisita,fechavisita,tipovisitas,estado,nombreemp,r.rutrepresent||'-'||r.digitoverirepresent rutcli from visitas v 
+inner join empresa e on e.rutemp = v.rutemp 
+inner join representante r on e.rutrepresent = r.rutrepresent where v.runprf=v_id;
+end;

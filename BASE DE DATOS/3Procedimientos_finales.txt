@@ -1,0 +1,319 @@
+--------------------------------------------------------
+--  DDL for Procedure SP_ASESORIA
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "PORTAFOLIO"."SP_ASESORIA" (v_fecha date,v_cant_accidentes number,v_rut_emp varchar,v_valor number,v_run_prof varchar)
+is
+v_id number;
+begin
+select max(idasesoria) into v_id from asesoria;
+
+insert into asesoria values((v_id + 1),v_fecha,v_cant_accidentes,0,substr(v_rut_emp,1,length(v_rut_emp)-1),v_valor,substr(v_run_prof,1,length(v_run_prof)-1));
+end;
+
+
+/
+--------------------------------------------------------
+--  DDL for Procedure SP_CAMBIO_ESTADO
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "PORTAFOLIO"."SP_CAMBIO_ESTADO" 
+(v_id_contrato number,v_id_asesoria number,v_estado varchar,v_runprf varchar)
+is
+begin
+
+update contrato set desccontrato=v_estado where v_id_contrato = idcontrato;
+update asesoria set runprf=v_runprf where v_id_asesoria = idasesoria;
+end;
+
+
+/
+--------------------------------------------------------
+--  DDL for Procedure SP_CAPACITACION
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "PORTAFOLIO"."SP_CAPACITACION" (v_fecha varchar,v_hora varchar,v_minuto varchar,v_cant_asistentes number,v_nombreemp varchar)
+is
+v_id number;
+v_estado varchar2(100);
+v_hora_final varchar2(100);
+v_rutemp varchar2(10);
+v_nombreprf varchar2(10);
+begin
+
+v_estado := 'PENDIENTE';
+v_hora_final:= (v_hora || ':' || v_minuto);
+
+SELECT p.runprf
+into v_nombreprf
+FROM PROFESIONAL P
+ join perfil per
+on per.runprf = p.runprf
+WHERE p.RUNPRF = 
+(SELECT RUNPRF 
+FROM PERFIL 
+where idperfil = (select max(idperfil) from perfil) and ROWNUM = 1
+) and ROWNUM = 1;
+
+select rutemp
+into v_rutemp
+from empresa
+where lower(nombreemp) =lower(v_nombreemp);
+
+select max(idcapacitacion) into v_id from capacitaciones;
+
+insert into capacitaciones values((v_id + 1),v_fecha,v_hora_final,v_cant_asistentes,v_estado,v_rutemp,v_nombreprf);
+end;
+
+/
+--------------------------------------------------------
+--  DDL for Procedure SP_CONTRASENA
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "PORTAFOLIO"."SP_CONTRASENA" (v_rut varchar,v_contrasena varchar)
+is
+begin
+
+update profesional SET contrasenaprf=v_contrasena where v_rut = runprf || digitoverificadorprf;
+
+end;
+
+/
+--------------------------------------------------------
+--  DDL for Procedure SP_CONTRATO
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "PORTAFOLIO"."SP_CONTRATO" (v_descontrato varchar,v_fechainicio varchar,v_rutemp varchar)
+is
+v_id number;
+begin
+select max(idcontrato) into v_id from contrato;
+insert into contrato values((v_id + 1),v_descontrato,v_fechainicio,substr(v_rutemp,1,length(v_rutemp)-1));
+end;
+
+
+/
+--------------------------------------------------------
+--  DDL for Procedure SP_EMPRESA
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "PORTAFOLIO"."SP_EMPRESA" (v_rut varchar,v_nombre varchar,v_direccion varchar,v_telefono number,v_correo varchar,v_comuna number,v_rubro varchar,v_rut_repre number)
+is
+v_digito number;
+begin
+v_digito := to_number(ltrim(rtrim(substr(v_rut, length(v_rut), 1))));
+
+insert into empresa values(substr(v_rut,1,length(v_rut)-1),v_nombre,v_direccion,v_telefono,v_correo,v_comuna,v_rubro,v_digito,substr(v_rut_repre,1,length(v_rut_repre)-1));
+
+end;
+
+
+/
+--------------------------------------------------------
+--  DDL for Procedure SP_PERFIL
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "PORTAFOLIO"."SP_PERFIL" (v_usuario varchar,v_contrasena varchar)
+is
+begin
+
+insert into perfil values(SEQ_IDPERFIL.NEXTVAL,v_usuario);
+
+end;
+
+/
+--------------------------------------------------------
+--  DDL for Procedure SP_PLAN
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "PORTAFOLIO"."SP_PLAN" (v_idplan number,v_id_asesoria number)
+is
+v_nombre_plan varchar(100);
+v_cant_visitas number;
+v_cant_asesorias number;
+v_cant_capacitacion number;
+v_id number;
+v_valor_plan number;
+V_EMP varchar2(10);
+V_PRF varchar2(10);
+begin
+
+select max(idplan) into v_id from plan;
+
+select descripcionplan,valorplan,cantvisitas,cantasesorias,cantcapacitacion
+into v_nombre_plan,v_valor_plan,v_cant_visitas,v_cant_asesorias,v_cant_capacitacion
+from tipoplan
+where idtipoplan = v_idplan;
+
+insert into plan values((v_id + 1),v_nombre_plan,v_cant_visitas,v_cant_asesorias,v_cant_capacitacion,v_valor_plan,v_id_asesoria,to_char(v_idplan));
+
+SELECT a.runprf
+into v_prf
+FROM ASESORIA A
+JOIN PLAN P
+ON a.idasesoria = p.idasesoria
+WHERE p.idplan  = (select max(idplan) from plan) and ROWNUM = 1 ;
+
+SELECT a.rutemp
+into v_emp
+FROM ASESORIA A
+JOIN PLAN P
+ON a.idasesoria = p.idasesoria
+WHERE p.idplan  = (select max(idplan) from plan) and ROWNUM = 1 ;
+
+WHILE v_cant_visitas > 0 LOOP
+    v_cant_visitas := v_cant_visitas-1;
+    insert into visitas values(SQ_VISITA.nextval,'PENDIENTE','PENDIENTE','PENDIENTE',v_emp,v_prf);
+  END LOOP;
+
+  WHILE v_cant_capacitacion > 0 LOOP
+    v_cant_capacitacion := v_cant_capacitacion-1;
+    insert into capacitaciones values(SQ_CAP.nextval,'PENDIENTE','PENDIENTE',0,'PENDIENTE',v_emp,v_prf);
+  END LOOP;
+
+end;
+
+/
+--------------------------------------------------------
+--  DDL for Procedure SP_PROFESIONAL
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "PORTAFOLIO"."SP_PROFESIONAL" (v_rut varchar,v_nombre varchar,v_apellido_mat varchar,v_apellido_pat varchar,v_correo varchar,v_telefono varchar,v_fecha_nacimiento varchar,v_direccion varchar,v_experiencia number,v_fecha_contrato varchar,v_profesion number,v_pais varchar,v_jornada number,v_genero number)
+is
+v_digito number;
+V_EDAD NUMBER;
+V_CONTRASENA VARCHAR2(10);
+begin
+v_digito := to_number(ltrim(rtrim(substr(v_rut, length(v_rut), 1))));
+
+V_EDAD := TO_NUMBER(EXTRACT(YEAR FROM (TO_DATE(SYSDATE))) - EXTRACT(YEAR FROM (TO_DATE(v_fecha_nacimiento))));
+
+V_CONTRASENA := V_RUT;
+
+insert into profesional values(substr(v_rut,1,length(v_rut)-1),v_nombre,v_apellido_mat,v_apellido_pat,v_edad,v_correo,v_telefono,v_fecha_nacimiento,v_direccion,v_experiencia,v_fecha_contrato, v_profesion,v_pais,to_number(v_digito),v_jornada,v_genero,v_contrasena);
+
+end;
+
+
+/
+--------------------------------------------------------
+--  DDL for Procedure SP_REGISTRO_VISITA
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "PORTAFOLIO"."SP_REGISTRO_VISITA" (v_id_registro varchar,v_desc1 varchar,v_desc2 varchar,v_desc3 varchar,v_descextra1 varchar,v_descextra2 varchar,v_descextra3 varchar)
+is
+v_extra1 varchar(100);
+v_extra2 varchar(100);
+v_extra3 varchar(100);
+begin
+
+IF v_descextra1='aun no disponible' 
+THEN v_extra1:=null;
+else
+v_extra1:=v_descextra1;
+end if;
+
+IF v_descextra2='aun no disponible' 
+THEN v_extra2:=null;
+else
+v_extra2:=v_descextra2;
+end if;
+
+IF v_descextra3='aun no disponible' 
+THEN v_extra3:=null;
+else
+v_extra3:=v_descextra3;
+end if;
+
+update Registro SET descripcionitem1=v_desc1,descripcionitem2=v_desc2,descripcionitem3=v_desc3,descripcionitem1extra=v_extra1,descripcionitem2extra=v_extra2,descripcionitem3extra=v_extra3
+where v_id_registro = idregistro;
+
+end;
+
+/
+--------------------------------------------------------
+--  DDL for Procedure SP_REPRESENTANTE
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "PORTAFOLIO"."SP_REPRESENTANTE" (v_rut number,v_nombre varchar,v_apellido varchar,v_cargo varchar,v_numero varchar,v_genero number)
+is
+v_digito number;
+begin
+v_digito := to_number(ltrim(rtrim(substr(v_rut, length(v_rut), 1))));
+
+insert into representante values(substr(v_rut,1,length(v_rut)-1),to_number(v_digito),v_nombre,v_apellido,v_cargo,v_numero,v_genero);
+
+end;
+
+
+/
+--------------------------------------------------------
+--  DDL for Procedure SP_TIPO_PLAN
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "PORTAFOLIO"."SP_TIPO_PLAN" (v_nombre varchar,v_valor number,v_cant_asesoria number,v_cant_capacitaciones number,v_cant_visita number)
+is
+v_id number;
+begin
+select max(idtipoplan) into v_id from tipoplan;
+
+
+insert into tipoplan values(v_id+1,v_nombre,v_valor,v_cant_visita,v_cant_asesoria,v_cant_capacitaciones);
+
+end;
+
+
+/
+--------------------------------------------------------
+--  DDL for Procedure SP_VISITA_REGISTRO
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "PORTAFOLIO"."SP_VISITA_REGISTRO" (V_DESC_1 VARCHAR,V_DESC_2 VARCHAR,V_DESC_3 VARCHAR,V_DESC_EXTRA_1 VARCHAR,V_DESC_EXTRA_2 VARCHAR,V_DESC_EXTRA_3 VARCHAR) 
+is
+v_id VARCHAR2(100);
+V_ID_VISITA NUMBER;
+begin
+select max(idregistro) into v_id from registro;
+select max(IDVISITA) into V_ID_VISITA from VISITAS;
+
+v_id := v_id + 1;
+
+insert into registro values(v_id,'0','0','0',null,null,null,null,null,null,null,null,null,V_ID_VISITA,V_DESC_1,V_DESC_2,V_DESC_3,V_DESC_EXTRA_1,V_DESC_EXTRA_2,V_DESC_EXTRA_3);
+end;
+
+/
+--------------------------------------------------------
+--  DDL for Procedure SP_VISITAS
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE NONEDITIONABLE PROCEDURE "PORTAFOLIO"."SP_VISITAS" (v_fecha varchar,v_tipo varchar,v_empresa varchar)
+is
+v_id number;
+v_RUTPRF VARCHAR2(10);
+begin
+select max(idvisita) into v_id from visitas;
+
+SELECT RUNPRF 
+INTO V_RUTPRF
+FROM PERFIL 
+where idperfil = (select max(idperfil) from perfil) and ROWNUM = 1;
+
+insert into visitas values((v_id + 1),v_fecha,v_tipo,'PENDIENTE',v_empresa,v_RUTPRF);
+
+end;
+
+/

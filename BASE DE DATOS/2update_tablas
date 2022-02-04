@@ -1,0 +1,2 @@
+insert into profesion VALUES (4,'ADMIN',2,'ADMIN');
+update profesional set idprofesion = 4 where runprf = '12';
